@@ -11,7 +11,7 @@ import java.util.function.BiFunction;
  * Created by nibunangs on 16-Aug-2017.
  */
 @Entity
-@Getter@Setter
+@Getter @Setter
 public class InputSourceEO {
     @Id
     private String id;
@@ -26,15 +26,24 @@ public class InputSourceEO {
 
     public static BiFunction<String, String, String> createId = (appName, inputSourceName) -> appName + "-" + inputSourceName;
 
-    public void copy(InputSource inputSource){
+    public void copy(InputSource inputSource) {
         setAppName(inputSource.getAppName());
         setSourceName(inputSource.getSourceName());
         setSourceType(inputSource.getSourceType());
 
-        if(getRequest() == null)
+        if (getRequest() == null)
             setRequest(new RequestEO());
         getRequest().copy(inputSource.getRequest());
+    }
 
+    public InputSource toInputSource() {
+        InputSource inputSource = new InputSource();
+        inputSource.setAppName(getAppName());
+        inputSource.setSourceName(getSourceName());
+        inputSource.setSourceType(getSourceType());
+        inputSource.setRequest(getRequest().toRequestInfo());
+
+        return inputSource;
     }
 
 }

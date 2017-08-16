@@ -21,15 +21,18 @@ public class InputSourceController {
     private InputSourceRepository inputSourceRepository;
 
     @PostMapping("/")
-    public InputSourceEO createOrUpdateInputSource(@RequestBody InputSource inputSourceVO) {
+    public InputSource createOrUpdateInputSource(@RequestBody InputSource inputSourceVO) {
         InputSourceEO inputSource = inputSourceService.save(inputSourceVO);
-        return inputSource;
+        return inputSource.toInputSource();
     }
 
     @GetMapping("/{app}/{inputSource}")
-    public InputSourceEO getInputSource(@PathVariable String app, @PathVariable String inputSource){
+    public InputSource getInputSource(@PathVariable String app, @PathVariable String inputSource) {
         String id = InputSourceEO.createId.apply(app, inputSource);
-        return inputSourceRepository.findOne(id);
+        InputSourceEO eo = inputSourceRepository.findOne(id);
+        if (eo == null)
+            throw new IllegalArgumentException("No InputSource with name '" + inputSource + "' in App '" + app + "'");
+        return eo.toInputSource();
     }
 
 }
