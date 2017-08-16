@@ -1,0 +1,3 @@
+#Gateway multinode set-up. Specify the hostName:port seperated by comma
+gatewayRoot=localhost:8080
+gatewayServers=localhost:8084,localhost:8085,localhost:8083,localhost:8082

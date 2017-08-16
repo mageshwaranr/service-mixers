@@ -69,12 +69,16 @@ project('gateway') {
     apply plugin: 'application'
     apply plugin: 'docker'
 
-
     mainClassName = "com.ttkey.service.mixers.gateway.GatewayBootstrap"
 
     dependencies {
         compile project(':commons')
         compileOnly "org.projectlombok:lombok:1.16.16"
+
+        compile group: 'io.undertow', name: 'undertow-core', version: '1.4.12.Final'
+        compile group: 'io.undertow', name: 'undertow-servlet', version: '1.4.12.Final'
+        compile group: 'io.undertow', name: 'undertow-websockets-jsr', version: '1.4.12.Final'
+
     }
 
 }
