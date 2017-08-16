@@ -1,5 +1,6 @@
 package com.ttkey.service.mixers.manifest.domain;
 
+import com.ttkey.service.mixers.model.manifest.App;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,12 +11,23 @@ import javax.persistence.Id;
  * Created by nibunangs on 16-Aug-2017.
  */
 @Entity
-@Getter@Setter
+@Getter @Setter
 public class AppEO {
 
     @Id
     private String name;
 
     private String configsJSON;
+
+    public AppEO copy(App app) {
+        setName(app.getName());
+        return this;
+    }
+
+    public App toApp() {
+        App app = new App();
+        app.setName(getName());
+        return app;
+    }
 
 }
