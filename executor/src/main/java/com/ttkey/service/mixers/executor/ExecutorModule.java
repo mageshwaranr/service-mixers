@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.ttkey.service.mixers.executor.client.AsyncRestClient;
+import com.ttkey.service.mixers.executor.client.RestClient;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.DefaultAsyncHttpClient;
 import org.asynchttpclient.DefaultAsyncHttpClientConfig;
@@ -18,6 +20,7 @@ public class ExecutorModule extends AbstractModule {
   @Override
   protected void configure() {
 
+    bind(RestClient.class).to(AsyncRestClient.class);
   }
 
   @Provides

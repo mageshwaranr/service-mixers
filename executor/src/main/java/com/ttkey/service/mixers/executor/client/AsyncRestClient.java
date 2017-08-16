@@ -11,7 +11,7 @@ import org.asynchttpclient.AsyncHttpClient;
 /**
  * Created by sivarajm on 8/17/2017.
  */
-public class AsyncRestClient {
+public class AsyncRestClient implements RestClient {
   @Inject
   ObjectMapper objectMapper;
 
