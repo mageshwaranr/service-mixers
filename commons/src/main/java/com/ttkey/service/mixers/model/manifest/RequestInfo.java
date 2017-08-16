@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Map;
+
 /**
  * Created by nibunangs on 16-Aug-2017.
  */
@@ -13,6 +15,8 @@ public class RequestInfo {
     private RequestMethod httpVerb;
 
     private String uri, body;
+
+    private Map<String, String> headers;
 
     public enum RequestMethod {
         GET, POST, PUT, PATCH, DELETE

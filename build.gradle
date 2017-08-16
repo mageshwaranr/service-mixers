@@ -39,12 +39,16 @@ project('manifest') {
 
     apply plugin: 'application'
     apply plugin: 'docker'
+    apply plugin: 'org.springframework.boot'
 
     mainClassName = "com.ttkey.service.mixers.manifest.ManifestBootstrap"
 
     dependencies {
         compile project(':commons')
         compileOnly "org.projectlombok:lombok:1.16.16"
+        compile('org.springframework.boot:spring-boot-starter-web')
+        compile('org.springframework.boot:spring-boot-starter-data-jpa')
+        compile('org.postgresql:postgresql:42.1.4')
     }
 
 }

@@ -18,8 +18,6 @@ public class InputSource {
 
     private RequestInfo request;
 
-    private Map<String, String> headers;
-
     public enum SourceType {
         REST
     }
