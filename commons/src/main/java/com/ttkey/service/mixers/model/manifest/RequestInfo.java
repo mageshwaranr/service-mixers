@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -20,5 +21,9 @@ public class RequestInfo {
 
     public enum RequestMethod {
         GET, POST, PUT, PATCH, DELETE
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers == null ? Collections.emptyMap() : headers;
     }
 }
