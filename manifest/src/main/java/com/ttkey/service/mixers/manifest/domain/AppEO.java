@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 /**
- * Created by nibunangs on 14-Aug-2017.
+ * Created by nibunangs on 16-Aug-2017.
  */
 @Entity
 @Getter@Setter
