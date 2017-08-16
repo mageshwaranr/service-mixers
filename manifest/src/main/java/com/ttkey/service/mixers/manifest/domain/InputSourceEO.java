@@ -21,10 +21,20 @@ public class InputSourceEO {
     private InputSource.SourceType sourceType;
 
     @OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
-    //    @MapsId
     @JoinColumn(name = "REQUEST_ID", unique = true, nullable = false)
     private RequestEO request;
 
     public static BiFunction<String, String, String> createId = (appName, inputSourceName) -> appName + "-" + inputSourceName;
+
+    public void copy(InputSource inputSource){
+        setAppName(inputSource.getAppName());
+        setSourceName(inputSource.getSourceName());
+        setSourceType(inputSource.getSourceType());
+
+        if(getRequest() == null)
+            setRequest(new RequestEO());
+        getRequest().copy(inputSource.getRequest());
+
+    }
 
 }

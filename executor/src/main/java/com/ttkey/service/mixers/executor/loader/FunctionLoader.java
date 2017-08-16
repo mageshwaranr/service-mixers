@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import javax.ws.rs.BadRequestException;
 
 import com.ttkey.service.mixers.executor.util.PropertyManager;
@@ -27,7 +28,7 @@ public class FunctionLoader {
 
     private static SmallLRUCache<String, ClassLoader> lruCache = SmallLRUCache.newInstance(50);
 
-    private static String MANIFEST_SVC_URL = PropertyManager.getProperty("MANIFEST_SVC_URL", "http://localhost:9090");
+    private static String MANIFEST_SVC_URL = PropertyManager.getProperty(PropertyManager.MANIFEST_SVC_URL, "http://localhost:9090");
 
     private static final Logger log = LoggerFactory.getLogger(FunctionLoader.class);
 
@@ -60,16 +61,19 @@ public class FunctionLoader {
         try {
             //http://localhost:8080/function/executable/NewApp/Fun1
             String uri = MANIFEST_SVC_URL + FETCH_EXECUTABLE_PREFIX + FORWARD_SLASH + app + FORWARD_SLASH + function;
+            log.info("Fetching executable from {}",uri);
             Response response = Request.Get(uri).execute();
+            Files.createDirectories(executable.getParentFile().toPath());
             response.saveContent(executable);
         } catch (IOException e) {
             log.error("Unable to download executable jar from manifest server due to "+e.getMessage(),e);
+            log.info("Delete the file at {} ? {}", executable.getAbsolutePath(), executable.delete());
             throw new BadRequestException("Unable to find executable of "+function, e);
         }
     }
 
     private URL constructLibURL(String app, String function) throws MalformedURLException {
-        File executable = new File(LIB_PATH + app + File.separator + function + RESOURCE_NAME_SUFFIX);
+        File executable = new File(LIB_PATH + File.separator+ app + File.separator + function + RESOURCE_NAME_SUFFIX);
         if (!executable.exists()) {
             downloadExecutable(app, function, executable);
         }

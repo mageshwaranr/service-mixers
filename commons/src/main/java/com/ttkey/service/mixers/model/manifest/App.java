@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created by nibunangs on 16-Aug-2017.
  */
-@Getter @Setter @ToString
+@ToString @Getter @Setter
 public class App {
 
     private String name;
