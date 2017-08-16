@@ -2,3 +2,6 @@ include "commons"
 include "manifest"
 include "executor"
 include "gateway"
+
+include "fibonacci-example"
+project(':fibonacci-example').projectDir = "$rootDir/examples/fibonacci" as File
