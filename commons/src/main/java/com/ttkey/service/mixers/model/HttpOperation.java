@@ -2,6 +2,7 @@ package com.ttkey.service.mixers.model;
 
 import java.util.Map;
 
+import com.ttkey.service.mixers.model.manifest.RequestInfo.RequestMethod;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,6 +11,8 @@ import lombok.ToString;
 @Setter
 @ToString
 public class HttpOperation {
+
+    private RequestMethod method;
 
     private String path;
 
