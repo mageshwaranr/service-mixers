@@ -6,8 +6,12 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 public class HttpRequest extends HttpOperation {
 
     private String baseUri;
+
+    public Object getRequestBody() {
+        return super.getBody();
+    }
 }

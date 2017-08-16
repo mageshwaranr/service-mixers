@@ -17,7 +17,7 @@ public class RequestInfo {
 
     private String uri, body;
 
-    private Map<String, String> headers;
+    private Map<String, String> headers ;
 
     public enum RequestMethod {
         GET, POST, PUT, PATCH, DELETE
