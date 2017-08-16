@@ -1,5 +1,4 @@
-# service-mixers
-Service Mixers
+# Service Mixers
 
 Service Mixers enable users to build new functional services by just providing business logic in form of functions. Users should focus only on writing business logic leaving rest of the plumbing work like interactions with other services to fetch input, expose stateless functions as a REST API, passing other services output to function to the framework. This also in-directly supports scaling by leveraging container orchestration frameworks like kubernetes.
 Frameworks like Istio takes care of most of the infrastructural aspects required for Service Mush. Service Mixers focuses only on application space and leaves the infrastructural aspects to desired architecture.
@@ -27,6 +26,11 @@ Function should be stateless and only depend on its input for the context and st
 ### Sources
 
 Source defines a data source with in the system. At the moment, only supported source is a HTTP (REST?) API. Multiple functions belonging to an APP can leverage the same source belonging to the same APP.
+
+## API's
+
+Once you deploy the service mixers, the following APIs will be available for you to try out. The list of apis are documented at swagger hub.
+Feel free to explore it here https://app.swaggerhub.com/api/mageshwaranr/ServiceMixers
 
 ## Example
 
