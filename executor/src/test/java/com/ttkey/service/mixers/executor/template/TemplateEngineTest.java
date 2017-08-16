@@ -34,8 +34,8 @@ public class TemplateEngineTest {
         zonesSource.setBody(gson.fromJson(body, Map.class));
         context.setSources(singletonMap("zones", zonesSource));
 
-        //function args depending on a source and request params
-        String[] functionArgs = {"@{sources['zones'].body['us-west']}", " @{request.queryParams['queryParam']}"};
+        //function args depending on a source and expectedAPI params
+        String[] functionArgs = {"@{sources['zones'].body['us-west']}", " @{expectedAPI.queryParams['queryParam']}"};
 
         Object[] replacedTemplates = engine.replaceTemplates(functionArgs, context);
         assertEquals(asList("us-west-1", "us-west-2", "us-west-3"), replacedTemplates[0]);

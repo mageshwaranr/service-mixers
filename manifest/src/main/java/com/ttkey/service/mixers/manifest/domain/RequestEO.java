@@ -6,6 +6,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.ttkey.service.mixers.model.manifest.RequestInfo.RequestMethod;
 
@@ -34,12 +36,27 @@ public class RequestEO {
     }
 
     public void copy(RequestInfo requestVO) {
+        if (requestVO == null)
+            return;
+
         setHttpVerb(requestVO.getHttpVerb());
         setUri(requestVO.getUri());
         setBody(requestVO.getBody());
 
         getHeaders().clear();
         requestVO.getHeaders().entrySet().forEach(entry -> addHeader(new HeadersEO(entry.getKey(), entry.getValue())));
+    }
+
+    public RequestInfo toRequestInfo() {
+        RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setHttpVerb(getHttpVerb());
+        requestInfo.setBody(getBody());
+        requestInfo.setUri(getUri());
+
+        Map<String, String> headers = getHeaders().stream().collect(Collectors.toMap(HeadersEO::getKey, HeadersEO::getValue));
+        requestInfo.setHeaders(headers);
+
+        return requestInfo;
     }
 
 }
