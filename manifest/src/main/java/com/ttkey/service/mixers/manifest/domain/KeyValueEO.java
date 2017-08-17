@@ -18,7 +18,7 @@ public class KeyValueEO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
+    private Long id;
 
     private String key, value;
 
