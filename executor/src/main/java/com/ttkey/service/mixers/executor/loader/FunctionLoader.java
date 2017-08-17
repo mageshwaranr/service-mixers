@@ -4,12 +4,14 @@ import static com.ttkey.service.mixers.executor.util.PropertyManager.FETCH_EXECU
 import static com.ttkey.service.mixers.executor.util.PropertyManager.FORWARD_SLASH;
 import static com.ttkey.service.mixers.executor.util.PropertyManager.RESOURCE_NAME_SUFFIX;
 
+import com.ttkey.service.mixers.executor.CustomConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
+import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 
 import com.ttkey.service.mixers.executor.util.PropertyManager;
@@ -21,15 +23,10 @@ import org.slf4j.LoggerFactory;
 
 public class FunctionLoader {
 
-    private static final String USR_LIB_PATH = System.getProperty("user.dir");
-    private static final String CUSTOM_LIB_PATH = System.getProperty("mixer.executable.dir");
-
-    private static String LIB_PATH = CUSTOM_LIB_PATH == null ? USR_LIB_PATH : CUSTOM_LIB_PATH;
+    @Inject
+    CustomConfiguration configuration;
 
     private static SmallLRUCache<String, ClassLoader> lruCache = SmallLRUCache.newInstance(50);
-
-    private static String MANIFEST_SVC_URL = PropertyManager.getProperty(PropertyManager.MANIFEST_SVC_URL, "http://localhost:9090");
-
     private static final Logger log = LoggerFactory.getLogger(FunctionLoader.class);
 
 
@@ -60,7 +57,7 @@ public class FunctionLoader {
     private void downloadExecutable(String app, String function, File executable) {
         try {
             //http://localhost:8080/function/executable/NewApp/Fun1
-            String uri = MANIFEST_SVC_URL + FETCH_EXECUTABLE_PREFIX + FORWARD_SLASH + app + FORWARD_SLASH + function;
+            String uri = configuration.getManifestSvcUrl() + FETCH_EXECUTABLE_PREFIX + FORWARD_SLASH + app + FORWARD_SLASH + function;
             log.info("Fetching executable from {}",uri);
             Response response = Request.Get(uri).execute();
             Files.createDirectories(executable.getParentFile().toPath());
@@ -73,6 +70,7 @@ public class FunctionLoader {
     }
 
     private URL constructLibURL(String app, String function) throws MalformedURLException {
+        String LIB_PATH = configuration.getMixerExecutableDir() == null ? configuration.getUserDir() : configuration.getMixerExecutableDir();
         File executable = new File(LIB_PATH + File.separator+ app + File.separator + function + RESOURCE_NAME_SUFFIX);
         if (!executable.exists()) {
             downloadExecutable(app, function, executable);

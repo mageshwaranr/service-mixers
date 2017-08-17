@@ -5,3 +5,6 @@ server:
   adminConnectors:
   - type: http
     port: 9001
+userDir: /var/run/
+mixerExecutableDir: dynamiclibs/
+manifestSvcUrl: http://localhost:9090
