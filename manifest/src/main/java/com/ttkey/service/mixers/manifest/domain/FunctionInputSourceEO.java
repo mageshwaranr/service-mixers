@@ -28,7 +28,7 @@ public class FunctionInputSourceEO {
 
     public FunctionInputSourceEO(String appName, String alias, String inputSourceName) {
         InputSourceEO inputSourceEO = new InputSourceEO();
-        inputSourceEO.setId(createId.apply(inputSource.getAppName(), inputSource.getSourceName()));
+        inputSourceEO.setId(createId.apply(appName, inputSourceName));
 
         setInputSource(inputSourceEO);
         setAlias(alias);

@@ -24,6 +24,6 @@ public class Function {
     @Getter @Setter @ToString @NoArgsConstructor @AllArgsConstructor
     public static class AliasAndIS {
         private String alias;
-        private String isName;
+        private String sourceName;
     }
 }

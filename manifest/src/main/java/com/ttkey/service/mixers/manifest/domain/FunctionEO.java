@@ -45,7 +45,7 @@ public class FunctionEO {
 
         getInputSources().clear();
         functionVO.getInputSources().forEach(
-                aliasAndIS -> getInputSources().add(new FunctionInputSourceEO(getApp(), aliasAndIS.getAlias(), aliasAndIS.getIsName())));
+                aliasAndIS -> getInputSources().add(new FunctionInputSourceEO(getApp(), aliasAndIS.getAlias(), aliasAndIS.getSourceName())));
     }
 
     public Function toFunction() {
