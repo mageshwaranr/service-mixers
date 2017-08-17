@@ -7,6 +7,10 @@ import com.ttkey.service.mixers.model.manifest.InputSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 /**
  * Created by nibunangs on 16-Aug-2017.
  */
@@ -33,6 +37,12 @@ public class InputSourceController {
         if (eo == null)
             throw new IllegalArgumentException("No InputSource with name '" + inputSource + "' in App '" + app + "'");
         return eo.toInputSource();
+    }
+
+    @GetMapping("/")
+    public List<InputSource> getAllInputSource() {
+        Iterable<InputSourceEO> inputSourceEOS = inputSourceRepository.findAll();
+        return StreamSupport.stream(inputSourceEOS.spliterator(), false).map(InputSourceEO::toInputSource).collect(Collectors.toList());
     }
 
 }
