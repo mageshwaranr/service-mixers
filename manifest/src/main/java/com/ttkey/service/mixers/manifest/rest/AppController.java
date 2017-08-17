@@ -6,6 +6,8 @@ import com.ttkey.service.mixers.model.manifest.App;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -25,7 +27,13 @@ public class AppController {
 
     @RequestMapping(path = "/", method = POST)
     App createApp(@RequestBody App app) {
-        return appRepository.save(new AppEO().copy(app)).toApp();
+        AppEO eo = new AppEO().copy(app);
+
+        // Move to Service layer...
+        SecureRandom secureRandom = new SecureRandom();
+        String appKey = new BigInteger(63, secureRandom).toString(Character.MAX_RADIX).toLowerCase();
+        eo.setApikey(appKey);
+        return appRepository.save(eo).toApp();
     }
 
     @RequestMapping(path = "/{appName}", method = GET)
