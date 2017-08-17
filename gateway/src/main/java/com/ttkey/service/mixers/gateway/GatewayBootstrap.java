@@ -1,8 +1,12 @@
 package com.ttkey.service.mixers.gateway;
 
-import com.ttkey.service.mixers.handlers.ServiceHandler;
+import com.ttkey.service.mixers.cache.GatewayCacheRefreshTimer;
+import com.ttkey.service.mixers.handlers.ApiServiceHandler;
+import com.ttkey.service.mixers.handlers.AppServiceHandler;
+import com.ttkey.service.mixers.handlers.FunctionServiceHandler;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
+import io.undertow.server.handlers.BlockingHandler;
 import io.undertow.server.handlers.ResponseCodeHandler;
 import io.undertow.server.handlers.proxy.LoadBalancingProxyClient;
 import io.undertow.server.handlers.proxy.ProxyHandler;
@@ -12,12 +16,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Properties;
+import java.util.Timer;
 
 public class GatewayBootstrap {
 
     public static void main(final String[] args) {
         try {
 
+            // Round robin by default
             LoadBalancingProxyClient loadBalancer = new LoadBalancingProxyClient();
             loadBalancer.setConnectionsPerThread(20);
 
@@ -32,8 +38,10 @@ public class GatewayBootstrap {
                     .build();
             reverseProxy.start();
 
+            Timer timer = new Timer();
+            timer.schedule(new GatewayCacheRefreshTimer(), 0, 300000);
+
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -43,6 +51,9 @@ public class GatewayBootstrap {
         properties.load(new FileInputStream("C:\\DriveWorkspaces\\service-mixers\\gateway\\src\\main\\resources\\configurations.yaml"));
 
         String gatewayServersStr = properties.getProperty("gatewayServers");
+        if (gatewayServersStr.isEmpty() || gatewayServersStr == null) {
+            gatewayServersStr = properties.getProperty("gatewayRoot");
+        }
         String[] gatewayServers = gatewayServersStr.split(",");
 
         for (int i = 0; i < gatewayServers.length; i++) {
@@ -53,8 +64,11 @@ public class GatewayBootstrap {
             System.out.println("HostName " + hostName + " Port " + port);
             Undertow.builder()
                     .addHttpListener(Integer.valueOf(port), hostName)
-                    .setHandler(Handlers.pathTemplate()
-                            .add("/api/", new ServiceHandler()))
+                    .setHandler(new BlockingHandler(Handlers.pathTemplate()
+                            .add("/api/*", new ApiServiceHandler())
+                            .add("/app/*", new AppServiceHandler())
+                            .add("/function/*", new FunctionServiceHandler())
+                        ))
                     .build().start();
 
             loadBalancer.addHost(new URI("http://" + hostName + ":" + port));

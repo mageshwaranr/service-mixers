@@ -121,7 +121,9 @@ public class FunctionContextFactoryTest {
         Function function = new Function();
         function.setApp(app.getName());
         function.setName("FindEc2Price");
-        String[] args = {"@{sources['regions'].body}", "@{sources['azs'].body}", "{\"instances\" : [ \"m3.xlarge\",\"m3.3xlarge\" ] , \"apiKey\" : \"@{request.headers['key1']}\" }"};
+        String[] args = {"@{sources['regions'].body}", "@{sources['azs'].body}",
+                "{\"instances\" : [ \"m3.xlarge\",\"m3.3xlarge\" ] , " +
+                        "\"apiKey\" : \"@{request.headers['key1']}\" }"};
         function.setArgs(args);
         return function;
     }
