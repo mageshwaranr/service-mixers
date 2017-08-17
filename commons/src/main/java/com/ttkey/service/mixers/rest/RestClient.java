@@ -37,11 +37,11 @@ public class RestClient {
 
     private Logger log = LoggerFactory.getLogger(getClass());
 
-    public RestClient(){
+    public RestClient() {
         this(CONCURRENCY_LEVEL);
     }
 
-    public RestClient(int concurrency){
+    public RestClient(int concurrency) {
         client = FiberCloseableHttpAsyncClient.wrap(HttpAsyncClients.custom().
                 setMaxConnPerRoute(concurrency).
                 setMaxConnTotal(concurrency).
@@ -52,17 +52,17 @@ public class RestClient {
 
 
     public Map<String, HttpResponse> invokeRestApisSync(Map<String, HttpRequest> reqDetails) {
-        Map<String,CompletableFuture<HttpResponse>> asyncResponses = invokeRestApis(reqDetails);
+        Map<String, CompletableFuture<HttpResponse>> asyncResponses = invokeRestApis(reqDetails);
         CompletableFuture.allOf(asyncResponses.values().toArray(new CompletableFuture[0])).join();
-        Map<String,HttpResponse> responses = new HashMap<>();
+        Map<String, HttpResponse> responses = new HashMap<>();
         for (Entry<String, CompletableFuture<HttpResponse>> entry : asyncResponses.entrySet()) {
             responses.put(entry.getKey(), entry.getValue().join());
         }
         return responses;
     }
 
-    public Map<String,CompletableFuture<HttpResponse>> invokeRestApis(Map<String, HttpRequest> reqDetails) {
-        Map<String,CompletableFuture<HttpResponse>> asyncResponses = new HashMap<>();
+    public Map<String, CompletableFuture<HttpResponse>> invokeRestApis(Map<String, HttpRequest> reqDetails) {
+        Map<String, CompletableFuture<HttpResponse>> asyncResponses = new HashMap<>();
         for (Entry<String, HttpRequest> entry : reqDetails.entrySet()) {
             asyncResponses.put(entry.getKey(), invokeRestApi(entry.getValue()));
         }
@@ -75,18 +75,18 @@ public class RestClient {
         client.execute(request, new FutureCallback<org.apache.http.HttpResponse>() {
             @Override
             public void completed(org.apache.http.HttpResponse result) {
-              toResponse(result,reqDetails,response);
+                toResponse(result, reqDetails, response);
             }
 
             @Override
             public void failed(Exception ex) {
-                log.error("Unable to execute the HttpAPi for "+request.getMethod()+":"+request.getURI(), ex);
+                log.error("Unable to execute the HttpAPi for " + request.getMethod() + ":" + request.getURI(), ex);
                 response.completeExceptionally(ex);
             }
 
             @Override
             public void cancelled() {
-                log.warn("Cancelling API execution of {} ; {}",request.getMethod(), request.getURI());
+                log.warn("Cancelling API execution of {} ; {}", request.getMethod(), request.getURI());
                 response.cancel(false);
             }
         });
@@ -96,7 +96,7 @@ public class RestClient {
     private void toResponse(org.apache.http.HttpResponse result, HttpRequest req, CompletableFuture<HttpResponse> future) {
         try {
             HttpResponse response = new HttpResponse();
-            Map<String,String> headers = new HashMap<>();
+            Map<String, String> headers = new HashMap<>();
             for (Header header : result.getAllHeaders()) {
                 headers.put(header.getName(), header.getValue());
             }
@@ -108,40 +108,64 @@ public class RestClient {
             response.setPath(req.getPath());
             future.complete(response);
         } catch (Exception e) {
-            log.error("Unable to parse HttpResponse of "+req,e);
+            log.error("Unable to parse HttpResponse of " + req, e);
             future.completeExceptionally(e);
         }
     }
 
     private HttpUriRequest toRequest(HttpRequest inReq) {
         HttpUriRequest request;
-        String uri = inReq.getBaseUri() + "/" + inReq.getPath();
+        String uri = buildUri(inReq);
         switch (inReq.getMethod()) {
             case GET:
                 request = new HttpGet(uri);
                 break;
             case PUT:
-                request = enrichWithBody(new HttpPut(uri),inReq);
+                request = enrichWithBody(new HttpPut(uri), inReq);
                 break;
             case POST:
-                request = enrichWithBody(new HttpPost(uri),inReq);
+                request = enrichWithBody(new HttpPost(uri), inReq);
                 break;
             case PATCH:
-                request = enrichWithBody(new HttpPatch(uri),inReq);
+                request = enrichWithBody(new HttpPatch(uri), inReq);
                 break;
             case DELETE:
                 request = new HttpDelete(uri);
                 break;
             default:
-                throw new UnsupportedOperationException("Unsupported HTTP method "+inReq.getMethod());
+                throw new UnsupportedOperationException("Unsupported HTTP method " + inReq.getMethod());
         }
         inReq.getHeaders().forEach(request::addHeader);
 
         return request;
     }
 
+    private String buildUri(HttpRequest req) {
+        StringBuilder sb = new StringBuilder();
+        if (req.getBaseUri() != null) {
+            sb.append(req.getBaseUri()).append("/");
+        }
+        sb.append(req.getPath());
+        boolean isFirst = true;
+        for (Entry<String, Object> entry : req.getQueryParams().entrySet()) {
+            if (isFirst) {
+                isFirst = false;
+                sb.append("?");
+            } else {
+                sb.append("&");
+            }
+            sb.append(entry.getKey()).append("=").append(entry.getValue());
+        }
+        return sb.toString();
+    }
+
     private HttpEntityEnclosingRequestBase enrichWithBody(HttpEntityEnclosingRequestBase req, HttpRequest inReq) {
-        req.setEntity(new StringEntity(gson.toJson(inReq.getBody()), ContentType.APPLICATION_JSON));
+        Object body = inReq.getBody();
+        if (body instanceof String) {
+            req.setEntity(new StringEntity((String) body, ContentType.APPLICATION_JSON));
+        } else {
+            req.setEntity(new StringEntity(gson.toJson(body), ContentType.APPLICATION_JSON));
+        }
         return req;
     }
 }

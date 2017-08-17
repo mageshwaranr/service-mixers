@@ -11,7 +11,9 @@ import java.util.List;
 @Getter @Setter @ToString
 public class Function {
 
-    private String name, app, className, methodName, args;
+    private String name, app, className, methodName;
+
+    private String[] args;
 
     private RequestInfo expectedApi;
 

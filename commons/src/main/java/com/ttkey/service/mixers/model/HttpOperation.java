@@ -20,8 +20,6 @@ public class HttpOperation {
 
     private Map<String,Object> queryParams = emptyMap();
 
-    private Map<String,Integer> pathTemplates = emptyMap();
-
     private Map<String,String> pathParams = emptyMap();
 
     // this should be multi-map ?

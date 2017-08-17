@@ -43,11 +43,19 @@ public class TemplateEngineTest {
         assertEquals("value", replacedTemplates[1].toString().trim());
     }
 
+    @Test
+    public void testTemplate(){
+        String template = "{ \"region\" : \"@{request.body['region']}\" } ";
+        FunctionContext ctxt = new FunctionContext();
+        ctxt.setRequest(new HttpRequest());
+        ctxt.getRequest().setBody(singletonMap("region","us-west"));
+        System.out.println(engine.replaceTemplate(template,ctxt));
+    }
+
     private HttpRequest sampleHttpRequest() {
         HttpRequest request = new HttpRequest();
         request.setBaseUri("http://localhost:8080");
         request.setPath("/input/function/functionA");
-        request.setPathTemplates(singletonMap("functionA", 2));
         return request;
     }
 }
