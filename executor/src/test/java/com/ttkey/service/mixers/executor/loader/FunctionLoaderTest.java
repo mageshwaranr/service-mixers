@@ -13,7 +13,7 @@ import java.util.Random;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
-import com.ttkey.service.mixers.executor.util.PropertyManager;
+import com.ttkey.service.mixers.executor.util.Constants;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -45,7 +45,7 @@ public class FunctionLoaderTest {
         stubFor(WireMock.get(WireMock.urlEqualTo("/function/executable/example/fib1")).willReturn(aResponse().withBody(output)));
 
         stubFor(WireMock.get(WireMock.urlEqualTo("/function/executable/example/fib2")).willReturn(aResponse().withBody(output)));
-        System.setProperty(PropertyManager.MANIFEST_SVC_URL, "http://localhost:" + wireMockClassRule.port());
+        System.setProperty(Constants.MANIFEST_SVC_URL, "http://localhost:" + wireMockClassRule.port());
         System.out.println("Configured wiremock on " + wireMockClassRule.port());
     }
 

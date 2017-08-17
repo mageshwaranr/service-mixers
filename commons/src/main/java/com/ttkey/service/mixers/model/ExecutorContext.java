@@ -1,7 +1,9 @@
 package com.ttkey.service.mixers.model;
 
+import com.ttkey.service.mixers.model.manifest.App;
 import com.ttkey.service.mixers.model.manifest.Function;
 import com.ttkey.service.mixers.model.manifest.InputSource;
+import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +17,6 @@ public class ExecutorContext {
 
   HttpRequest httpRequest;
   Function function;
-
-  //Key is InputSource.sourceName
-  Map<String, InputSource> inputSources;
+  App app;
+  List<InputSource> inputSources;
 }

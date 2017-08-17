@@ -1,8 +1,8 @@
 package com.ttkey.service.mixers.executor.loader;
 
-import static com.ttkey.service.mixers.executor.util.PropertyManager.FETCH_EXECUTABLE_PREFIX;
-import static com.ttkey.service.mixers.executor.util.PropertyManager.FORWARD_SLASH;
-import static com.ttkey.service.mixers.executor.util.PropertyManager.RESOURCE_NAME_SUFFIX;
+import static com.ttkey.service.mixers.executor.util.Constants.FETCH_EXECUTABLE_PREFIX;
+import static com.ttkey.service.mixers.executor.util.Constants.FORWARD_SLASH;
+import static com.ttkey.service.mixers.executor.util.Constants.RESOURCE_NAME_SUFFIX;
 
 import com.ttkey.service.mixers.executor.CustomConfiguration;
 import java.io.File;
@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 
-import com.ttkey.service.mixers.executor.util.PropertyManager;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.h2.util.SmallLRUCache;

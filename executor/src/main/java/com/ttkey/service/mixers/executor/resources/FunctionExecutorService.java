@@ -1,10 +1,17 @@
 package com.ttkey.service.mixers.executor.resources;
 
+import com.google.gson.Gson;
+import com.ttkey.service.mixers.executor.loader.FunctionContextFactory;
+import com.ttkey.service.mixers.executor.model.FunctionContext;
+import com.ttkey.service.mixers.executor.util.TypeConverter;
 import com.ttkey.service.mixers.model.ExecutorContext;
 import com.ttkey.service.mixers.model.HttpResponse;
+import com.ttkey.service.mixers.model.manifest.InputSource;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -29,46 +36,55 @@ public class FunctionExecutorService {
     @Inject
     private FunctionLoader functionLoader;
 
+    @Inject
+    private FunctionContextFactory functionContextFactory;
+
+    @Inject
+    private Gson gson;
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Object execute(ExecutorContext executorContext) {
+    public HttpResponse execute(ExecutorContext executorContext) {
 
         ClassLoader classLoader = functionLoader.findClassLoader(executorContext.getFunction().getApp(), executorContext.getFunction().getName());
-
-        //TODO: this should come from args
-        String requestClassName = null;
+        FunctionContext functionContext = functionContextFactory.newFunctionContext(executorContext.getApp(), executorContext.getFunction(), executorContext.getInputSources(), executorContext.getHttpRequest());
+        HttpResponse httpResponse = new HttpResponse();
         try {
-            log.info("App: {}, Function: {}, Class: {}, Method: {}, classLoader: {}", executorContext.getFunction().getApp(), executorContext.getFunction().getName(), executorContext.getFunction().getClassName(), requestClassName, executorContext.getFunction().getMethodName(), classLoader);
+            log.info("App: {}, Function: {}, Class: {}, Method: {}, classLoader: {}", executorContext.getFunction().getApp(), executorContext.getFunction().getName(), executorContext.getFunction().getClassName(), executorContext.getFunction().getMethodName(), classLoader);
             Class classToLoad = Class.forName(executorContext.getFunction().getClassName(), true, classLoader);
-            Object requestObject = getRequestObject(requestClassName, classLoader);
-            Method method = classToLoad.getDeclaredMethod(executorContext.getFunction().getMethodName(), requestObject.getClass());
-            Object instance = classToLoad.newInstance();
-            return method.invoke(instance, requestObject);
-        } catch (ClassNotFoundException e) {
-            log.error("Unable to load class", e);
-            throw new WebApplicationException("is there a class named " + executorContext.getFunction().getClassName(), e);
-        } catch (NoSuchMethodException e) {
-            log.error(e.getMessage(), e);
-            throw new WebApplicationException("Is there a method named " + executorContext.getFunction().getMethodName() + " in class " + executorContext.getFunction().getClassName(), e);
-        } catch (IllegalAccessException e) {
-            log.error(e.getMessage(), e);
-            throw new WebApplicationException("IllegalAccess Exception : " + e.getMessage(),e);
-        } catch (InstantiationException e) {
-            log.error(e.getMessage(), e);
-            throw new WebApplicationException("Instantiation Exception : " + e.getMessage(),e);
-        } catch (InvocationTargetException e) {
-            log.error(e.getMessage(), e);
-            throw new WebApplicationException("Invocation Exception : " + e.getMessage(),e);
-        } catch (JsonParseException e) {
-            log.error(e.getMessage(), e);
-            throw new WebApplicationException("Json Parse Exception : " + e.getMessage(),e);
-        } catch (JsonMappingException e) {
-            log.error(e.getMessage(), e);
-            throw new WebApplicationException("Json Mapping Exception : " + e.getMessage(),e);
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-            throw new WebApplicationException("IO Exception : " + e.getMessage(),e);
+
+            for (Method m : classToLoad.getClass().getMethods()) {
+                if (executorContext.getFunction().getMethodName().equals(m.getName())) {
+                    Class<?>[] params = m.getParameterTypes();
+                    if (params.length == functionContext.getArgs().length) {
+                        Object methodParams[] = new Object[params.length];
+                        for(int i = 0; i< params.length; i++) {
+                            if(params[i].isPrimitive()) {
+                                methodParams[i]= TypeConverter.convertToPrimitiveOrEnum(functionContext.getArgs()[i].toString(), params[i]);
+                            } else {
+                                methodParams[i]= gson.fromJson(functionContext.getArgs()[i].toString(), params[i].getClass());
+                            }
+                        }
+                        Object instance = classToLoad.newInstance();
+                        Object responseObject = m.invoke(instance, methodParams);
+                        httpResponse.setStatusCode(200);
+                        httpResponse.setBody(gson.toJson(responseObject));
+                        return httpResponse;
+                    } else {
+                        httpResponse.setStatusCode(500);
+                        httpResponse.setBody("Method params didn't match function context arguments");
+                        return httpResponse;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Function executor failed {}", e);
+            httpResponse.setStatusCode(500);
+            httpResponse.setBody(e.getMessage());
+            return httpResponse;
         }
+
+        return httpResponse;
     }
 
     private Object getRequestObject(String requestClassName, ClassLoader classLoader) throws IOException, ClassNotFoundException {
