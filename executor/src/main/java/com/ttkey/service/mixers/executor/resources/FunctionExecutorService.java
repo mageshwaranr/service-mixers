@@ -53,7 +53,7 @@ public class FunctionExecutorService {
             log.info("App: {}, Function: {}, Class: {}, Method: {}, classLoader: {}", executorContext.getFunction().getApp(), executorContext.getFunction().getName(), executorContext.getFunction().getClassName(), executorContext.getFunction().getMethodName(), classLoader);
             Class classToLoad = Class.forName(executorContext.getFunction().getClassName(), true, classLoader);
 
-            for (Method m : classToLoad.getClass().getMethods()) {
+            for (Method m : classToLoad.getMethods()) {
                 if (executorContext.getFunction().getMethodName().equals(m.getName())) {
                     Class<?>[] params = m.getParameterTypes();
                     if (params.length == functionContext.getArgs().length) {
