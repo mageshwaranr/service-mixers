@@ -1,10 +1,13 @@
 package com.ttkey.service.mixers.executor.resources;
 
+import com.ttkey.service.mixers.model.ExecutorContext;
+import com.ttkey.service.mixers.model.HttpResponse;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -26,27 +29,27 @@ public class FunctionExecutorService {
     @Inject
     private FunctionLoader functionLoader;
 
-    @GET
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Object execute(@QueryParam("app") String app, @QueryParam("function") String function,
-                          @QueryParam("className") String className, @QueryParam("requestClassName") String requestClassName,
-                          @QueryParam("methodName") String methodName) {
+    public Object execute(ExecutorContext executorContext) {
 
-        ClassLoader classLoader = functionLoader.findClassLoader(app, function);
+        ClassLoader classLoader = functionLoader.findClassLoader(executorContext.getFunction().getApp(), executorContext.getFunction().getName());
 
+        //TODO: this should come from args
+        String requestClassName = null;
         try {
-            log.info("App: {}, Function: {}, Class: {}, Method: {}, classLoader: {}", app, function, className, requestClassName, methodName, classLoader);
-            Class classToLoad = Class.forName(className, true, classLoader);
+            log.info("App: {}, Function: {}, Class: {}, Method: {}, classLoader: {}", executorContext.getFunction().getApp(), executorContext.getFunction().getName(), executorContext.getFunction().getClassName(), requestClassName, executorContext.getFunction().getMethodName(), classLoader);
+            Class classToLoad = Class.forName(executorContext.getFunction().getClassName(), true, classLoader);
             Object requestObject = getRequestObject(requestClassName, classLoader);
-            Method method = classToLoad.getDeclaredMethod(methodName, requestObject.getClass());
+            Method method = classToLoad.getDeclaredMethod(executorContext.getFunction().getMethodName(), requestObject.getClass());
             Object instance = classToLoad.newInstance();
             return method.invoke(instance, requestObject);
         } catch (ClassNotFoundException e) {
             log.error("Unable to load class", e);
-            throw new WebApplicationException("is there a class named " + className, e);
+            throw new WebApplicationException("is there a class named " + executorContext.getFunction().getClassName(), e);
         } catch (NoSuchMethodException e) {
             log.error(e.getMessage(), e);
-            throw new WebApplicationException("Is there a method named " + methodName + " in class " + className, e);
+            throw new WebApplicationException("Is there a method named " + executorContext.getFunction().getMethodName() + " in class " + executorContext.getFunction().getClassName(), e);
         } catch (IllegalAccessException e) {
             log.error(e.getMessage(), e);
             throw new WebApplicationException("IllegalAccess Exception : " + e.getMessage(),e);
