@@ -131,3 +131,16 @@ project('fibonacci-example'){
     apply plugin: 'application'
     mainClassName = 'com.servicemixers.demo.recursion.FibonacciInVMFunction'
 }
+
+
+project('aws-inventory-example'){
+    apply plugin: 'application'
+    mainClassName = 'com.servicemixers.demo.ec2.FibonacciInVMFunction'
+
+    dependencies {
+        compileOnly "org.projectlombok:lombok:1.16.16"
+
+        testCompile project(':commons')
+    }
+
+}

@@ -5,3 +5,6 @@ include "gateway"
 
 include "fibonacci-example"
 project(':fibonacci-example').projectDir = "$rootDir/examples/fibonacci" as File
+
+include "aws-inventory-example"
+project(':aws-inventory-example').projectDir = "$rootDir/examples/aws-inventory" as File
