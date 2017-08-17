@@ -62,7 +62,7 @@ public class FunctionExecutorService {
                             if(params[i].isPrimitive()) {
                                 methodParams[i]= TypeConverter.convertToPrimitiveOrEnum(functionContext.getArgs()[i].toString(), params[i]);
                             } else {
-                                methodParams[i]= gson.fromJson(functionContext.getArgs()[i].toString(), params[i].getClass());
+                                methodParams[i]= gson.fromJson(functionContext.getArgs()[i].toString(), params[i]);
                             }
                         }
                         Object instance = classToLoad.newInstance();
