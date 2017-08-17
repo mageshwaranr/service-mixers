@@ -28,6 +28,7 @@ public class FunctionEO {
 
     private String className, methodName, args;
 
+    @Column(length = 25500000)
     private byte[] executable;
 
     @OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
