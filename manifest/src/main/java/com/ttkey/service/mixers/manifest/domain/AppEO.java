@@ -17,7 +17,7 @@ public class AppEO {
     @Id
     private String name;
 
-    private String configsJSON;
+    private String apikey;
 
     public AppEO copy(App app) {
         setName(app.getName());

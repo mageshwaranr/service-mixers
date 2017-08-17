@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ public class RequestEO {
     @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinColumn(name = "request_id")
     @OrderColumn
-    private List<HeadersEO> headers;
+    private List<HeadersEO> headers = new ArrayList<>();
 
     public void addHeader(HeadersEO headerEO) {
         headers.add(headerEO);

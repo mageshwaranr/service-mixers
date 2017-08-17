@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -31,8 +32,8 @@ public class FunctionEO {
     private RequestEO expectedAPI;
 
     @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
-    @JoinColumn(name = "funktion_id")
-    private List<FunctionInputSourceEO> inputSources;
+    @JoinColumn(name = "function_id")
+    private List<FunctionInputSourceEO> inputSources = new ArrayList<>();
 
     public void copy(Function functionVO) {
         setName(functionVO.getName());
