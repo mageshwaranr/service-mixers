@@ -20,6 +20,7 @@ import jdk.internal.util.xml.impl.Input;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -48,13 +49,14 @@ public class ApiServiceHandler implements HttpHandler {
             // /api/v1/mixer/executor
             // Body ExecutorContext
             HttpRequest request = new HttpRequest();
-            request.setBaseUri("http://localhost:9000/api/v1/mixer/executor");
+            request.setBaseUri("http://localhost:9000/");
+            request.setPath("api/v1/mixer/executor");
             request.setMethod(RequestInfo.RequestMethod.POST);
 
             ExecutorContext context = new ExecutorContext();
             context.setApp(getApp(function));
             context.setFunction(function);
-            context.setHttpRequest(request);
+            //context.setHttpRequest(request);
 
             List<Function.AliasAndIS> ips = function.getInputSources();
             List<InputSource>  sources = new ArrayList<>();
@@ -65,7 +67,9 @@ public class ApiServiceHandler implements HttpHandler {
             request.setBody(context);
 
             RestClient client = new RestClient();
-            client.invokeRestApi(request);
+            HttpResponse response =  client.invokeRestApi(request).get();
+            System.out.println(response.getBody());
+
         }
     }
 
