@@ -16,4 +16,6 @@ public class App {
 
     private Map<String, String> configs;
 
+    private String appKey;
+
 }

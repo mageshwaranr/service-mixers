@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static com.ttkey.service.mixers.manifest.domain.FunctionEO.createId;
 
@@ -56,6 +60,14 @@ public class FunctionController {
             throw new IllegalArgumentException("No Function with name '" + function + "' in App '" + app + "'");
 
         return eo.toFunction();
+    }
+
+    @GetMapping("/function/")
+    public List<Function> getAllFunctions() {
+        Iterable<FunctionEO> allFunctions = functionRepository.findAll();
+        Stream<FunctionEO> functionEOStream = StreamSupport.stream(allFunctions.spliterator(), false);
+
+        return functionEOStream.map(FunctionEO::toFunction).collect(Collectors.toList());
     }
 
     @ExceptionHandler(StorageException.class)

@@ -55,19 +55,6 @@ public class FunctionServiceImpl implements FunctionService {
                     String.format("Couldn't find the resources for AppEO '%s' and Function '%s'", app, function));
 
         return new ByteArrayResource(funktion.getExecutable());
-        //                String fileName = "catalina.log";
-        //                try {
-        //                    Path file = rootLocation.resolve(fileName);
-        //                    Resource resource = new UrlResource(file.toUri());
-        //                    if (resource.exists() || resource.isReadable()) {
-        //                        return resource;
-        //                    } else {
-        //                        throw new FunktionResourceNotFoundException(
-        //                                "Could not get or read file: " + file.toUri());
-        //                    }
-        //                } catch (MalformedURLException e) {
-        //                    throw new FunktionResourceNotFoundException("Could not read file: " + fileName, e);
-        //                }
     }
 
     @Override
@@ -86,5 +73,10 @@ public class FunctionServiceImpl implements FunctionService {
             function.copy(functionVO);
 
         return functionRepository.save(function);
+    }
+
+    public void getAllFunctionsWithAppKeys(){
+        Iterable<FunctionEO> functionEOS = functionRepository.findAll();
+
     }
 }

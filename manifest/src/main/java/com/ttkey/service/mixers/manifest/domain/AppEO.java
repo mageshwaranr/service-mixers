@@ -27,6 +27,7 @@ public class AppEO {
     public App toApp() {
         App app = new App();
         app.setName(getName());
+        app.setAppKey(getApikey());
         return app;
     }
 
