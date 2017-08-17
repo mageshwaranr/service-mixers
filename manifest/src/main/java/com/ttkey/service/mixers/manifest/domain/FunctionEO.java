@@ -25,6 +25,8 @@ public class FunctionEO {
     @Column(nullable = false)
     private String name, app;
 
+    private String className, methodName, args;
+
     private byte[] executable;
 
     @OneToOne(cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
@@ -38,6 +40,9 @@ public class FunctionEO {
     public void copy(Function functionVO) {
         setName(functionVO.getName());
         setApp(functionVO.getApp());
+        setClassName(functionVO.getClassName());
+        setMethodName(functionVO.getMethodName());
+        setArgs(functionVO.getArgs());
 
         if (getExpectedAPI() == null)
             setExpectedAPI(new RequestEO());
@@ -45,14 +50,17 @@ public class FunctionEO {
 
         getInputSources().clear();
         functionVO.getInputSources().forEach(
-                aliasAndIS -> getInputSources().add(new FunctionInputSourceEO(getApp(), aliasAndIS.getAlias(), aliasAndIS.getSourceName())));
+                aliasAndIS -> getInputSources()
+                        .add(new FunctionInputSourceEO(getApp(), aliasAndIS.getAlias(), aliasAndIS.getSourceName())));
     }
 
     public Function toFunction() {
         Function function = new Function();
         function.setApp(getApp());
         function.setName(getName());
-
+        function.setClassName(getClassName());
+        function.setMethodName(getMethodName());
+        function.setArgs(getArgs());
         function.setExpectedApi(getExpectedAPI().toRequestInfo());
 
         List<Function.AliasAndIS> inputSources = getInputSources().stream().map(FunctionInputSourceEO::toAlaisAndIS)
