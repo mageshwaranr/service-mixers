@@ -1,5 +1,6 @@
 package com.ttkey.service.mixers.manifest.service;
 
+import com.google.gson.Gson;
 import com.ttkey.service.mixers.manifest.domain.FunctionEO;
 import com.ttkey.service.mixers.manifest.repository.FunctionRepository;
 import com.ttkey.service.mixers.manifest.service.exception.FunctionResourceNotFoundException;
@@ -22,6 +23,9 @@ import static org.springframework.util.ObjectUtils.isEmpty;
  */
 @Service
 public class FunctionServiceImpl implements FunctionService {
+
+    @Autowired
+    private Gson gson;
 
     @Autowired
     private FunctionRepository functionRepository;
@@ -70,7 +74,8 @@ public class FunctionServiceImpl implements FunctionService {
             function = new FunctionEO();
             function.setId(functionId);
         }
-            function.copy(functionVO);
+
+        function.copy(functionVO,gson);
 
         return functionRepository.save(function);
     }

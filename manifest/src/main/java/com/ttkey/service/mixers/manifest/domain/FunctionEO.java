@@ -1,5 +1,6 @@
 package com.ttkey.service.mixers.manifest.domain;
 
+import com.google.gson.Gson;
 import com.ttkey.service.mixers.model.manifest.Function;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,12 +38,12 @@ public class FunctionEO {
     @JoinColumn(name = "function_id")
     private List<FunctionInputSourceEO> inputSources = new ArrayList<>();
 
-    public void copy(Function functionVO) {
+    public void copy(Function functionVO, Gson gson) {
         setName(functionVO.getName());
         setApp(functionVO.getApp());
         setClassName(functionVO.getClassName());
         setMethodName(functionVO.getMethodName());
-        setArgs(functionVO.getArgs());
+        setArgs(gson.toJson(functionVO.getArgs()));
 
         if (getExpectedAPI() == null)
             setExpectedAPI(new RequestEO());
@@ -54,13 +55,13 @@ public class FunctionEO {
                         .add(new FunctionInputSourceEO(getApp(), aliasAndIS.getAlias(), aliasAndIS.getSourceName())));
     }
 
-    public Function toFunction() {
+    public Function toFunction(Gson gson) {
         Function function = new Function();
         function.setApp(getApp());
         function.setName(getName());
         function.setClassName(getClassName());
         function.setMethodName(getMethodName());
-        function.setArgs(getArgs());
+        function.setArgs(gson.fromJson(getArgs(), String[].class));
         function.setExpectedApi(getExpectedAPI().toRequestInfo());
 
         List<Function.AliasAndIS> inputSources = getInputSources().stream().map(FunctionInputSourceEO::toAlaisAndIS)

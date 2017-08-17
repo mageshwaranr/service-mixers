@@ -1,5 +1,6 @@
 package com.ttkey.service.mixers.manifest.rest;
 
+import com.google.gson.Gson;
 import com.ttkey.service.mixers.manifest.domain.FunctionEO;
 import com.ttkey.service.mixers.manifest.repository.FunctionRepository;
 import com.ttkey.service.mixers.manifest.service.FunctionService;
@@ -25,6 +26,9 @@ import static com.ttkey.service.mixers.manifest.domain.FunctionEO.createId;
  */
 @RestController
 public class FunctionController {
+
+    @Autowired
+    private Gson gson;
 
     @Autowired
     private FunctionService functionService;
@@ -59,7 +63,7 @@ public class FunctionController {
         if (eo == null)
             throw new IllegalArgumentException("No Function with name '" + function + "' in App '" + app + "'");
 
-        return eo.toFunction();
+        return eo.toFunction(gson);
     }
 
     @GetMapping("/function/")
@@ -67,7 +71,7 @@ public class FunctionController {
         Iterable<FunctionEO> allFunctions = functionRepository.findAll();
         Stream<FunctionEO> functionEOStream = StreamSupport.stream(allFunctions.spliterator(), false);
 
-        return functionEOStream.map(FunctionEO::toFunction).collect(Collectors.toList());
+        return functionEOStream.map(functionEO -> functionEO.toFunction(gson)).collect(Collectors.toList());
     }
 
     @ExceptionHandler(StorageException.class)
